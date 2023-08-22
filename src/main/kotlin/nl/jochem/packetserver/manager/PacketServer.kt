@@ -1,5 +1,6 @@
 package nl.jochem.packetserver.manager
 
+import nl.jochem.packetserver.PacketManager
 import java.net.ServerSocket
 import java.util.*
 import kotlin.collections.HashMap
@@ -43,5 +44,7 @@ class PacketServer(port: Int) : PacketControl() {
             it.value.disable()
         }
         server.close()
+        println("Server master closed")
+        PacketManager.shutdown = true
     }
 }

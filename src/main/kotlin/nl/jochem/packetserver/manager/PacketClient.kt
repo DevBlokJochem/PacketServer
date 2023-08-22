@@ -49,7 +49,7 @@ class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
         reader.close()
         writer.close()
         connection.close()
-
         println("Connection $port closed")
+        PacketManager.shutdown = true
     }
 }

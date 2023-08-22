@@ -17,6 +17,8 @@ object PacketManager {
     private lateinit var managerType: ManagerType
     private lateinit var serverID: UUID
     private var connected = false
+    internal var shutdown = false
+    private var closed = false
 
     fun main(args: Array<String>) {
         println("===========================================")
@@ -69,9 +71,15 @@ object PacketManager {
         }
     }
 
-    fun shutdown() {
-        if(!connected) return println("The server wasn't even online")
+    fun shutdown(): Boolean {
+        if(closed) return this.shutdown
+        this.closed = true
+        if(!connected) {
+            println("The server wasn't even online")
+            return true
+        }
         send(ServerClosePacket(serverID))
         packetControl.disable()
+        return this.shutdown
     }
 }
