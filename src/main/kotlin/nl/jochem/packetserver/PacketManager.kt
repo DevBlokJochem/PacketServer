@@ -18,6 +18,14 @@ object PacketManager {
     private lateinit var serverID: UUID
     private var connected = false
 
+    fun main(args: Array<String>) {
+        println("===========================================")
+        println("=                                         =")
+        println("= The jar file 'PacketServer' is useless! =")
+        println("=                                         =")
+        println("===========================================")
+    }
+
     fun enable(serverType: ManagerType) {
         this.managerType = managerType
         this.serverID = serverID
@@ -66,12 +74,4 @@ object PacketManager {
         send(ServerClosePacket(serverID))
         packetControl.disable()
     }
-}
-
-fun main(args: Array<String>) {
-    println("===========================================")
-    println("=                                         =")
-    println("= The jar file 'PacketServer' is useless! =")
-    println("=                                         =")
-    println("===========================================")
 }

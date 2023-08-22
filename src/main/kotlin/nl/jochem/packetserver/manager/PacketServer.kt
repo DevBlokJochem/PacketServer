@@ -44,6 +44,4 @@ class PacketServer(port: Int) : PacketControl() {
         }
         server.close()
     }
-
-
 }
