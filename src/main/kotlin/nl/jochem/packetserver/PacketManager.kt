@@ -23,9 +23,8 @@ object PacketManager {
 
     fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>): SubscriptionPacket<T>? = packetServer.subscribe(type, callback)
     fun send(serverID: UUID, packet: Packet) {
-        if(isEnabled(serverID)) clients[serverID]!!.send(packet)
+        if(isEnabled(serverID)) return clients[serverID]!!.send(packet)
         println("You cannot send the packet ${packet.packetID} because you haven't specified a server.")
-        return
     }
 
     fun createClient(serverID: UUID, port: Int) {
