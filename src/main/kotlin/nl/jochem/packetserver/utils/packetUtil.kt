@@ -2,11 +2,7 @@ package nl.jochem.packetserver.utils
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
-import nl.jochem.packetserver.PacketManager
 import nl.jochem.packetserver.packethelpers.Packet
-import nl.jochem.packetserver.packethelpers.SubscriptionPacket
-import nl.jochem.packetserver.packets.ServerOpenPacket
-import java.util.function.Consumer
 
 
 fun getPacketType(input: String) : Packet? {
@@ -26,13 +22,6 @@ fun getPacket(input: String, packet: Class<*>) : Any? {
     }
 }
 
-fun getServerOpenPacket(input: String) : ServerOpenPacket? {
-    return try {
-        GsonBuilder().create()!!.fromJson(input, ServerOpenPacket::class.java)
-    }catch (error: JsonSyntaxException) {
-        null
-    }
-}
 
 fun <T : Packet> getSpecificPacket(input: String, type: Class<T>) : Packet? {
     return try {
