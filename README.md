@@ -15,3 +15,12 @@ Run `PacketServer.send(<your packet>)` to send your packet
 **Subscribing to packets**
 
 Run `PacketServer.subscribe(<your packet>::class.java>) { <the code that will run> }` to listen to incoming packets.
+
+
+Client:
+listen
+write
+
+Server:
+listen to every packet
+write specific server

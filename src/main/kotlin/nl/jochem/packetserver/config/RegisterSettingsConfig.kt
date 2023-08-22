@@ -3,7 +3,6 @@ package nl.jochem.packetserver.config
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.util.*
-import kotlin.collections.HashMap
 
 private const val filename: String = "packetserver/settings.json"
 
@@ -15,7 +14,7 @@ class RegisterSettingsConfig {
             File(filename).createNewFile()
             File(filename).writeText(GsonBuilder().setPrettyPrinting().create()!!.toJson(PacketServerSettings(
                 serverPort = 25800,
-                clients = HashMap()
+                serverID = UUID.randomUUID()
             )))
         }
     }
@@ -26,5 +25,5 @@ class RegisterSettingsConfig {
 
 data class PacketServerSettings(
     val serverPort: Int,
-    val clients: HashMap<UUID, Int>,
+    val serverID: UUID
 )

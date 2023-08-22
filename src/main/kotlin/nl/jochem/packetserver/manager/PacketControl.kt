@@ -1,31 +1,20 @@
-package nl.jochem.packetserver
+package nl.jochem.packetserver.manager
 
-import nl.jochem.packetserver.packethelpers.SubscriptionPacket
+import com.google.gson.GsonBuilder
 import nl.jochem.packetserver.packethelpers.Packet
+import nl.jochem.packetserver.packethelpers.SubscriptionPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacket
-import java.net.ServerSocket
+import java.io.OutputStream
+import java.nio.charset.Charset
 import java.util.function.Consumer
-import kotlin.concurrent.thread
 
-class PacketServer(private val port: Int) {
+abstract class PacketControl {
 
-    private val server: ServerSocket = ServerSocket(port)
     private val listeners: ArrayList<SubscriptionPacket<*>> = ArrayList()
 
-    init {
-        println("Packet server is running on port ${server.localPort}")
-
-        thread {
-            while (true) {
-                val client = server.accept()
-                if(client.inetAddress.hostAddress != "127.0.0.1") client.close()
-                println("Client connected: ${client.inetAddress.hostAddress}")
-
-                // Run client in it's own thread.
-                thread { ClientHandler(client).run(this) }
-            }
-        }
+    fun send(packet: Packet, writer: OutputStream) {
+        writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 
     fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>): SubscriptionPacket<T> {
@@ -42,4 +31,7 @@ class PacketServer(private val port: Int) {
             }
         }
     }
+
+    abstract fun disable()
+
 }
