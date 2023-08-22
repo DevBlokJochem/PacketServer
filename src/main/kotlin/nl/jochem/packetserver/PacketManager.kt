@@ -9,8 +9,6 @@ import nl.jochem.packetserver.packets.ServerClosePacket
 import java.util.UUID
 import java.util.function.Consumer
 
-//TODO UUID from the client
-
 object PacketManager {
     private lateinit var packetControl: PacketControl
     private lateinit var config: PacketServerSettings
