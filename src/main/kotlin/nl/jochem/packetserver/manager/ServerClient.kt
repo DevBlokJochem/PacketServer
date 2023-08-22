@@ -4,7 +4,6 @@ import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packets.ServerOpenPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacketType
-import nl.jochem.packetserver.utils.getServerOpenPacket
 import nl.jochem.packetserver.utils.getSpecificPacket
 import java.io.OutputStream
 import java.net.Socket
