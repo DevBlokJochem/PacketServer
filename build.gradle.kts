@@ -4,8 +4,8 @@ plugins {
     `maven-publish`
 }
 
-group = "nl.jochem"
-version = "1.0"
+group = "nl.jochem.packetserver"
+version = "2.0"
 
 repositories {
     mavenCentral()
