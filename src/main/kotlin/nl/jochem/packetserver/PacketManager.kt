@@ -27,7 +27,7 @@ object PacketManager {
     }
 
     fun enable(serverType: ManagerType) {
-        this.managerType = managerType
+        this.managerType = serverType
         this.serverID = serverID
         config = RegisterSettingsConfig().getInstance()
 
