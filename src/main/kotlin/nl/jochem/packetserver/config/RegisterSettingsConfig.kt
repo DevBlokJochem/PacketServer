@@ -5,7 +5,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
 
-private const val filename: String = "packetserver/settings"
+private const val filename: String = "packetserver/settings.json"
 
 class RegisterSettingsConfig {
 
