@@ -28,8 +28,8 @@ object PacketManager {
 
     fun enable(serverType: ManagerType) {
         this.managerType = serverType
-        this.serverID = serverID
         config = RegisterSettingsConfig().getInstance()
+        this.serverID = config.serverID
 
         if(serverType == ManagerType.Server) {
             this.packetControl = PacketServer(config.serverPort)
