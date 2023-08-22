@@ -47,6 +47,7 @@ class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
     override fun disable() {
         connected = false
         reader.close()
+        writer.close()
         connection.close()
 
         println("Connection $port closed")
