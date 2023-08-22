@@ -10,6 +10,7 @@ private const val filename: String = "packetserver/settings.json"
 class RegisterSettingsConfig {
 
     init {
+        if(!File("packetserver").exists()) { File("packetserver").mkdirs() }
         if (!File(filename).exists()) {
             File(filename).createNewFile()
             File(filename).writeText(GsonBuilder().setPrettyPrinting().create()!!.toJson(PacketServerSettings(
