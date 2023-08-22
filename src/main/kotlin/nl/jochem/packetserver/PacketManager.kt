@@ -41,6 +41,12 @@ object PacketManager {
             clients.remove(serverID)
         }
     }
+
+    fun shutdown() {
+        clients.forEach {
+            it.value.disconnect()
+        }
+    }
 }
 
 fun main(args: Array<String>) {
