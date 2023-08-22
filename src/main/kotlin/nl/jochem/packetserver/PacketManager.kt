@@ -72,8 +72,6 @@ object PacketManager {
     }
 
     fun shutdown(): Boolean {
-        if(closed) return this.shutdown
-        this.closed = true
         if(!connected) {
             println("The server wasn't even online")
             return true
