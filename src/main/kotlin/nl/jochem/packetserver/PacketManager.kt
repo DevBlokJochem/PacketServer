@@ -12,7 +12,7 @@ import java.util.function.Consumer
 object PacketManager {
     private lateinit var packetControl: PacketControl
     private lateinit var config: PacketServerSettings
-    private lateinit var managerType: ManagerType
+    private var managerType: ManagerType? = null
     private lateinit var serverID: UUID
     private var connected = false
     internal var shutdown = false
@@ -27,6 +27,7 @@ object PacketManager {
     }
 
     fun enable(serverType: ManagerType) {
+        if(this.managerType != null) return println("The packetserver $managerType is already enabled.")
         this.managerType = serverType
         config = RegisterSettingsConfig().getInstance()
         this.serverID = config.serverID
@@ -68,6 +69,10 @@ object PacketManager {
             }
         }
     }
+
+    fun getServerType(): ManagerType? = managerType
+    fun getConfig(): PacketServerSettings = config
+    fun reloadConfig() { config = RegisterSettingsConfig().getInstance() }
 
     fun shutdown(): Boolean {
         if(!connected) {

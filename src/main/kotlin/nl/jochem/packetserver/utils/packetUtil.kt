@@ -11,7 +11,6 @@ fun getPacketType(input: String) : Packet? {
     }catch (error: JsonSyntaxException) {
         null
     }
-
 }
 
 fun getPacket(input: String, packet: Class<*>) : Any? {

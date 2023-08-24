@@ -1,27 +1,30 @@
 package nl.jochem.packetserver.manager
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import nl.jochem.packetserver.PacketManager
 import java.net.ServerSocket
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.concurrent.thread
 
 class PacketServer(port: Int) : PacketControl() {
 
     private val server: ServerSocket = ServerSocket(port)
     private val clients: HashMap<UUID, ServerClient> = HashMap()
+    private val instance: PacketServer = this
 
     init {
         println("Packet server is running on port ${server.localPort}")
 
-        thread {
+        GlobalScope.launch(Dispatchers.IO) {
             while (true) {
                 val client = server.accept()
                 if(client.inetAddress.hostAddress != "127.0.0.1") client.close()
                 println("Client connected: ${client.inetAddress.hostAddress}")
 
                 // Run client in it's own thread.
-                thread { ServerClient(client, this).run() }
+                ServerClient(client, instance).run()
             }
         }
     }

@@ -1,5 +1,8 @@
 package nl.jochem.packetserver.manager
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import nl.jochem.packetserver.PacketManager
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packets.ServerOpenPacket
@@ -7,7 +10,6 @@ import nl.jochem.packetserver.utils.getPacketType
 import java.io.OutputStream
 import java.net.Socket
 import java.util.*
-import kotlin.concurrent.thread
 
 class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
 
@@ -25,17 +27,21 @@ class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
     }
 
     private fun read() {
-        thread {
+        GlobalScope.launch(Dispatchers.IO) {
             while (connected) {
                 try {
                     val text = reader.nextLine()
 
                     if(getPacketType(text) != null) {
-                        recieve(text, getPacketType(text) as Packet)
+                        launch(Dispatchers.Main) {
+                            recieve(text, getPacketType(text) as Packet)
+                        }
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
-                    PacketManager.shutdown()
+                    launch(Dispatchers.Main) {
+                        PacketManager.shutdown()
+                    }
                 } finally {
 
                 }

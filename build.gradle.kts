@@ -15,6 +15,9 @@ repositories {
 dependencies {
     //json config things
     implementation("com.google.code.gson:gson:2.8.6")
+
+    // Async
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
 }
 
 tasks.test {
