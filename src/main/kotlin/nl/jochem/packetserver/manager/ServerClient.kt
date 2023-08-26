@@ -35,12 +35,10 @@ class ServerClient(client: Socket, packetServer: PacketServer) {
                 try {
                     val text = reader.nextLine()
                     if(getPacketType(text) != null) {
-                        launch(Dispatchers.Main) {
-                            if(getPacketType(text)!!.packetID == ServerOpenPacket::class.java.createName()) {
-                                packetServer.createClient((getSpecificPacket(text, ServerOpenPacket::class.java) as ServerOpenPacket).serverID, instance)
-                            }else{
-                                packetServer.recieve(text, getPacketType(text) as Packet)
-                            }
+                        if(getPacketType(text)!!.packetID == ServerOpenPacket::class.java.createName()) {
+                            packetServer.createClient((getSpecificPacket(text, ServerOpenPacket::class.java) as ServerOpenPacket).serverID, instance)
+                        }else{
+                            packetServer.recieve(text, getPacketType(text) as Packet)
                         }
                     }
                 } catch (ex: Exception) {

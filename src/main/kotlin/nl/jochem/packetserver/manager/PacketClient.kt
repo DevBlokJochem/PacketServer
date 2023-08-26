@@ -33,15 +33,11 @@ class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
                     val text = reader.nextLine()
 
                     if(getPacketType(text) != null) {
-                        launch(Dispatchers.Main) {
-                            recieve(text, getPacketType(text) as Packet)
-                        }
+                        recieve(text, getPacketType(text) as Packet)
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
-                    launch(Dispatchers.Main) {
-                        PacketManager.shutdown()
-                    }
+                    PacketManager.shutdown()
                 } finally {
 
                 }
