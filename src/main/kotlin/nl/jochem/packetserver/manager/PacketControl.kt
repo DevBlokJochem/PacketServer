@@ -1,6 +1,7 @@
 package nl.jochem.packetserver.manager
 
 import com.google.gson.GsonBuilder
+import nl.jochem.packetserver.config.RegisterSettingsConfig
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packethelpers.SubscriptionPacket
 import nl.jochem.packetserver.utils.createName
@@ -12,8 +13,10 @@ import java.util.function.Consumer
 abstract class PacketControl {
 
     private val listeners: ArrayList<SubscriptionPacket<*>> = ArrayList()
+    private val logged = RegisterSettingsConfig().getInstance().logs
 
     fun send(packet: Packet, writer: OutputStream) {
+        if(logged) println("Send: ${packet.packetID}")
         writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 
@@ -24,6 +27,7 @@ abstract class PacketControl {
     }
 
     fun recieve(input: String, packet: Packet) {
+        if(logged) println("Receive: ${packet.packetID}")
         listeners.filter { sub -> packet.packetID == sub.packetType.createName() }.forEach {sub ->
             val packet = getPacket(input, sub.packetType)
             if(packet != null) {
