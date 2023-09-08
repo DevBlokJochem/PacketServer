@@ -15,7 +15,6 @@ object PacketManager {
     private lateinit var serverID: UUID
     private var connected = false
     internal var shutdown = false
-    private var closed = false
 
     fun main(args: Array<String>) {
         println("===========================================")

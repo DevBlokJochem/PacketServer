@@ -16,7 +16,7 @@ abstract class PacketControl {
     private val logged = RegisterSettingsConfig().getInstance().logs
 
     fun send(packet: Packet, writer: OutputStream) {
-        if(logged) println("Send: ${packet.packetID}")
+        if(logged) println("Send: ${packet.packetID} (${packet::class.java.createName()})")
         writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 
