@@ -16,7 +16,7 @@ abstract class PacketControl {
     private val logged = RegisterSettingsConfig().getInstance().logs
 
     fun send(packet: Packet, writer: OutputStream) {
-        if(logged) println("Send: ${packet.packetID} (${packet::class.java.createName()})")
+        if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
         writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 
@@ -27,7 +27,7 @@ abstract class PacketControl {
     }
 
     fun recieve(input: String, packet: Packet) {
-        if(logged) println("Receive: ${packet.packetID}")
+        if(logged) println("Receive packet: ${packet.packetID} (${packet::class.java.createName()})")
         listeners.filter { sub -> packet.packetID == sub.packetType.createName() }.forEach {sub ->
             val packet = getPacket(input, sub.packetType)
             if(packet != null) {
