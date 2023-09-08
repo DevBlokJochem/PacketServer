@@ -5,7 +5,6 @@ import nl.jochem.packetserver.config.RegisterSettingsConfig
 import nl.jochem.packetserver.manager.*
 import nl.jochem.packetserver.packethelpers.SubscriptionPacket
 import nl.jochem.packetserver.packethelpers.Packet
-import nl.jochem.packetserver.packets.ServerClosePacket
 import java.util.UUID
 import java.util.function.Consumer
 
@@ -36,16 +35,6 @@ object PacketManager {
             this.packetControl = PacketServer(config.serverPort)
         }else if(serverType == ManagerType.Client) {
             this.packetControl = PacketClient(config.serverPort, serverID)
-        }
-
-        if(managerType == ManagerType.Client) {
-            subscribe(ServerClosePacket::class.java) {
-                packetControl.disable()
-            }
-        }else{
-            subscribe(ServerClosePacket::class.java) {
-                (packetControl as PacketServer).disableClient(it.serverID)
-            }
         }
 
         this.connected = true
@@ -79,7 +68,6 @@ object PacketManager {
             println("The server wasn't even online")
             return true
         }
-        send(ServerClosePacket(serverID))
         packetControl.disable()
         return this.shutdown
     }
