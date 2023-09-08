@@ -34,12 +34,11 @@ class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
 
                     if(getPacketType(text) != null) {
                         recieve(text, getPacketType(text) as Packet)
+                    }else{
+                        println("PacketClient.getPacketType(text) == null")
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
-                    PacketManager.shutdown()
-                } finally {
-
                 }
             }
         }
