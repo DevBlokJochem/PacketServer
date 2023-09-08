@@ -4,8 +4,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.jochem.packetserver.PacketManager
-import nl.jochem.packetserver.packethelpers.Packet
+import nl.jochem.packetserver.packets.ServerClosePacket
 import nl.jochem.packetserver.packets.ServerOpenPacket
+import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacketType
 import java.io.OutputStream
 import java.net.Socket
@@ -29,16 +30,21 @@ class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
     private fun read() {
         GlobalScope.launch(Dispatchers.IO) {
             while (connected) {
-                try {
+                if(reader.hasNextLine()) {
                     val text = reader.nextLine()
 
-                    if(getPacketType(text) != null) {
-                        recieve(text, getPacketType(text) as Packet)
+                    val packet = getPacketType(text)
+                    if(packet != null) {
+                        if(packet.packetID == ServerClosePacket::class.java.createName()) {
+                            disable()
+                        }
+                        recieve(text, packet)
                     }else{
                         println("PacketClient.getPacketType(text) == null")
+                        println("========================================")
+                        println(text)
+                        println("========================================")
                     }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
                 }
             }
         }
@@ -48,7 +54,6 @@ class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
     override fun disable() {
         connected = false
         reader.close()
-        writer.close()
         connection.close()
         println("Connection $port closed")
         PacketManager.shutdown = true

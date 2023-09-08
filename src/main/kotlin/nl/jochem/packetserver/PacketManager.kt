@@ -3,8 +3,9 @@ package nl.jochem.packetserver
 import nl.jochem.packetserver.config.PacketServerSettings
 import nl.jochem.packetserver.config.RegisterSettingsConfig
 import nl.jochem.packetserver.manager.*
-import nl.jochem.packetserver.packethelpers.SubscriptionPacket
 import nl.jochem.packetserver.packethelpers.Packet
+import nl.jochem.packetserver.packethelpers.SubscriptionPacket
+import nl.jochem.packetserver.packets.ServerClosePacket
 import java.util.UUID
 import java.util.function.Consumer
 
@@ -67,6 +68,7 @@ object PacketManager {
             println("The server wasn't even online")
             return true
         }
+        send(ServerClosePacket(serverID))
         packetControl.disable()
         return this.shutdown
     }

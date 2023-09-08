@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.jochem.packetserver.packethelpers.Packet
+import nl.jochem.packetserver.packets.ServerClosePacket
 import nl.jochem.packetserver.packets.ServerOpenPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacketType
@@ -13,13 +14,13 @@ import java.net.Socket
 import java.nio.charset.Charset
 import java.util.*
 
-class ServerClient(client: Socket, packetServer: PacketServer) {
-    private val client: Socket = client
+class ServerClient(private val client: Socket, packetServer: PacketServer) {
     private val reader: Scanner = Scanner(client.getInputStream())
     internal val writer: OutputStream = client.getOutputStream()
     private var running: Boolean = false
     private val packetServer: PacketServer
     private val instance: ServerClient = this
+    private lateinit var cliendID: UUID
 
     init {
         this.packetServer = packetServer
@@ -27,32 +28,35 @@ class ServerClient(client: Socket, packetServer: PacketServer) {
 
     fun run() {
         running = true
-        // Welcome message
-        write("Connected to the server [server]")
 
         GlobalScope.launch(Dispatchers.IO) {
             while (running) {
                 try {
-                    val text = reader.nextLine()
-                    if(getPacketType(text) != null) {
-                        if(getPacketType(text)!!.packetID == ServerOpenPacket::class.java.createName()) {
-                            packetServer.createClient((getSpecificPacket(text, ServerOpenPacket::class.java) as ServerOpenPacket).serverID, instance)
-                        }else{
-                            packetServer.recieve(text, getPacketType(text) as Packet)
+                    if(reader.hasNextLine()) {
+                        val text = reader.nextLine()
+
+                        val packet = getPacketType(text)
+                        if(packet != null) {
+                            if(packet.packetID == ServerOpenPacket::class.java.createName()) {
+                                val specificPacket = getSpecificPacket(text, ServerOpenPacket::class.java) as ServerOpenPacket
+                                packetServer.createClient(specificPacket.serverID, instance)
+                                cliendID = specificPacket.serverID
+                            }else{
+                                if(packet.packetID == ServerClosePacket::class.java.createName()) {
+                                    disable()
+                                    packetServer.disableClient(cliendID)
+                                }
+                                packetServer.recieve(text, getPacketType(text) as Packet)
+                            }
                         }
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
-                    disable()
                 }
             }
         }
 
 
-    }
-
-    private fun write(message: String) {
-        writer.write((message + '\n').toByteArray(Charset.defaultCharset()))
     }
 
     fun disable() {
