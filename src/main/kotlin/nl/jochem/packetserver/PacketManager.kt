@@ -40,7 +40,7 @@ object PacketManager {
         this.connected = true
     }
 
-    fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>, priority: Int = 5): SubscriptionPacket<T>? = packetControl.subscribe(type, callback, priority)
+    fun <T : Packet> subscribe(type: Class<T>, priority: Int = 5, callback: Consumer<T>): SubscriptionPacket<T> = packetControl.subscribe(type, callback, priority)
 
     fun send(packet: Packet, serverID: UUID? = null, exclude: UUID? = null) {
         if(!connected) return
