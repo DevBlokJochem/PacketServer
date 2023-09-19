@@ -21,8 +21,8 @@ abstract class PacketControl {
         writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 
-    fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>): SubscriptionPacket<T> {
-        val subscription: SubscriptionPacket<T> = SubscriptionPacket(type, callback)
+    fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>, priority: Int): SubscriptionPacket<T> {
+        val subscription: SubscriptionPacket<T> = SubscriptionPacket(type, callback, priority)
         listeners.add(subscription)
         return subscription
     }

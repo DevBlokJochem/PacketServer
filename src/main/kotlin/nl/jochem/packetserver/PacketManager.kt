@@ -40,9 +40,9 @@ object PacketManager {
         this.connected = true
     }
 
-    fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>): SubscriptionPacket<T>? = packetControl.subscribe(type, callback)
+    fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>, priority: Int = 5): SubscriptionPacket<T>? = packetControl.subscribe(type, callback, priority)
 
-    fun send(packet: Packet, serverID: UUID? = null) {
+    fun send(packet: Packet, serverID: UUID? = null, exclude: UUID? = null) {
         if(!connected) return
         if(managerType == ManagerType.Client) {
             packetControl.send(packet, (packetControl as PacketClient).writer)
@@ -50,7 +50,7 @@ object PacketManager {
             val packetServer = packetControl as PacketServer
             if(serverID == null) {
                 packetServer.getClients().forEach {
-                    packetControl.send(packet, it.value.writer)
+                    if(exclude != it.key) packetControl.send(packet, it.value.writer)
                 }
             }else{
                 if(packetServer.getClients().containsKey(serverID)) return packetControl.send(packet, packetServer.getClients()[serverID]!!.writer)
