@@ -8,11 +8,12 @@ import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacket
 import java.io.OutputStream
 import java.nio.charset.Charset
+import java.util.PriorityQueue
 import java.util.function.Consumer
 
 abstract class PacketControl {
 
-    private val listeners: ArrayList<SubscriptionPacket<*>> = ArrayList()
+    private val listeners: PriorityQueue<SubscriptionPacket<*>> = PriorityQueue()
     private val logged = RegisterSettingsConfig().getInstance().logs
 
     fun send(packet: Packet, writer: OutputStream) {
