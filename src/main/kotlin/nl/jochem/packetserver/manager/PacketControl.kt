@@ -1,6 +1,8 @@
 package nl.jochem.packetserver.manager
 
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import nl.jochem.packetserver.config.RegisterSettingsConfig
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packethelpers.SubscriptionPacket
@@ -28,11 +30,13 @@ abstract class PacketControl {
     }
 
     fun recieve(input: String, packet: Packet) {
-        if(logged) println("Receive packet: ${packet.packetID} (${packet::class.java.createName()})")
-        listeners.filter { sub -> packet.packetID == sub.packetType.createName() }.forEach {sub ->
-            val packet = getPacket(input, sub.packetType)
-            if(packet != null) {
-                sub.handle(packet as Packet)
+        GlobalScope.launch {
+            if(logged) println("Receive packet: ${packet.packetID} (${packet::class.java.createName()})")
+            listeners.filter { sub -> packet.packetID == sub.packetType.createName() }.forEach {sub ->
+                val packet = getPacket(input, sub.packetType)
+                if(packet != null) {
+                    sub.handle(packet as Packet)
+                }
             }
         }
     }
