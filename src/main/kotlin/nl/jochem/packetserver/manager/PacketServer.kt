@@ -8,7 +8,7 @@ import java.net.ServerSocket
 import java.util.*
 import kotlin.collections.HashMap
 
-class PacketServer(port: Int) : PacketControl() {
+class PacketServer(serverIP: String, port: Int) : PacketControl() {
 
     private val server: ServerSocket = ServerSocket(port)
     private val clients: HashMap<UUID, ServerClient> = HashMap()
@@ -20,7 +20,7 @@ class PacketServer(port: Int) : PacketControl() {
         GlobalScope.launch(Dispatchers.IO) {
             while (true) {
                 val client = server.accept()
-                if(client.inetAddress.hostAddress != "127.0.0.1") client.close()
+                if(serverIP == "localhost" && client.inetAddress.hostAddress != "127.0.0.1") client.close()
                 println("Client connected: ${client.inetAddress.hostAddress}")
 
                 // Run client in it's own thread.

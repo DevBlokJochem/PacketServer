@@ -13,9 +13,10 @@ class RegisterSettingsConfig {
         if (!File(filename).exists()) {
             File(filename).createNewFile()
             File(filename).writeText(GsonBuilder().setPrettyPrinting().create()!!.toJson(PacketServerSettings(
+                serverIP = "localhost",
                 serverPort = 25800,
                 serverID = UUID.randomUUID(),
-                true
+                logs = true
             )))
         }
     }
@@ -25,6 +26,7 @@ class RegisterSettingsConfig {
 }
 
 data class PacketServerSettings(
+    val serverIP: String,
     val serverPort: Int,
     val serverID: UUID,
     val logs: Boolean

@@ -32,9 +32,9 @@ object PacketManager {
         this.serverID = config.serverID
 
         if(serverType == ManagerType.Server) {
-            this.packetControl = PacketServer(config.serverPort)
+            this.packetControl = PacketServer(config.serverIP, config.serverPort)
         }else if(serverType == ManagerType.Client) {
-            this.packetControl = PacketClient(config.serverPort, serverID)
+            this.packetControl = PacketClient(config.serverIP, config.serverPort, serverID)
         }
 
         this.connected = true

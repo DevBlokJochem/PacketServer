@@ -12,11 +12,8 @@ import java.io.OutputStream
 import java.net.Socket
 import java.util.*
 
-class PacketClient(private val port: Int, serverID: UUID) : PacketControl() {
-
-    private val address = "localhost"
+class PacketClient(address: String, private val port: Int, serverID: UUID) : PacketControl() {
     private var connected: Boolean = true
-
     private var connection: Socket = Socket(address, port)
     private var reader: Scanner = Scanner(connection.getInputStream())
     internal var writer: OutputStream = connection.getOutputStream()
