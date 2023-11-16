@@ -5,4 +5,8 @@ import java.util.UUID
 
 data class ServerOpenPacket(
     val serverID: UUID
-) : Packet("ServerOpenPacket")
+) : Packet(ID) {
+    companion object {
+        val ID = "ServerOpenPacket"
+    }
+}

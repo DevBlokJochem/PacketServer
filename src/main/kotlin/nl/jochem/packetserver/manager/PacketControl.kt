@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import nl.jochem.packetserver.config.RegisterSettingsConfig
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packethelpers.SubscriptionPacket
+import nl.jochem.packetserver.packets.ServerOpenPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacket
 import java.io.OutputStream
@@ -43,6 +44,8 @@ abstract class PacketControl {
     abstract fun disable()
     fun online(writer: OutputStream? = null) {
         online = true
+        loggedPackets.removeIf { packet -> packet.packetID == ServerOpenPacket.ID }
+        send(ServerOpenPacket(RegisterSettingsConfig().getInstance().serverID))
         loggedPackets.forEach {
             send(it, writer)
         }
