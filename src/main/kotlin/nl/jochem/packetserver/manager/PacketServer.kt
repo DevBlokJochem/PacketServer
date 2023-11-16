@@ -1,10 +1,15 @@
 package nl.jochem.packetserver.manager
 
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.jochem.packetserver.PacketManager
+import nl.jochem.packetserver.packethelpers.Packet
+import nl.jochem.packetserver.utils.createName
+import java.io.OutputStream
 import java.net.ServerSocket
+import java.nio.charset.Charset
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -27,6 +32,11 @@ class PacketServer(serverIP: String, port: Int) : PacketControl() {
                 ServerClient(client, instance).run()
             }
         }
+    }
+
+    override fun send(packet: Packet, writer: OutputStream) {
+        if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
+        writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 
     internal fun createClient(serverID: UUID, serverClient: ServerClient) {

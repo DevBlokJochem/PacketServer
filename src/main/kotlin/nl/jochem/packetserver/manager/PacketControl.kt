@@ -1,6 +1,5 @@
 package nl.jochem.packetserver.manager
 
-import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -10,19 +9,18 @@ import nl.jochem.packetserver.packethelpers.SubscriptionPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacket
 import java.io.OutputStream
-import java.nio.charset.Charset
-import java.util.PriorityQueue
+import java.util.*
 import java.util.function.Consumer
 
 abstract class PacketControl {
 
     private val listeners: PriorityQueue<SubscriptionPacket<*>> = PriorityQueue()
-    private val logged = RegisterSettingsConfig().getInstance().logs
+    internal val logged = RegisterSettingsConfig().getInstance().logs
+    internal val loggedPackets: ArrayList<Packet> = ArrayList()
 
-    fun send(packet: Packet, writer: OutputStream) {
-        if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
-        writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
-    }
+    var online = false
+
+    abstract fun send(packet: Packet, writer: OutputStream)
 
     fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>, priority: Int): SubscriptionPacket<T> {
         val subscription: SubscriptionPacket<T> = SubscriptionPacket(type, callback, priority)
@@ -43,5 +41,10 @@ abstract class PacketControl {
     }
 
     abstract fun disable()
-
+    fun online(writer: OutputStream) {
+        online = true
+        loggedPackets.forEach {
+            send(it, writer)
+        }
+    }
 }

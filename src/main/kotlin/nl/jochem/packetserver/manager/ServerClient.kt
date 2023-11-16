@@ -11,7 +11,6 @@ import nl.jochem.packetserver.utils.getPacketType
 import nl.jochem.packetserver.utils.getSpecificPacket
 import java.io.OutputStream
 import java.net.Socket
-import java.nio.charset.Charset
 import java.util.*
 
 class ServerClient(private val client: Socket, packetServer: PacketServer) {
@@ -55,8 +54,6 @@ class ServerClient(private val client: Socket, packetServer: PacketServer) {
                 }
             }
         }
-
-
     }
 
     fun disable() {

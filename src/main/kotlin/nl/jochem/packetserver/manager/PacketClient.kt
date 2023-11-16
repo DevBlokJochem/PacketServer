@@ -1,57 +1,107 @@
 package nl.jochem.packetserver.manager
 
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.jochem.packetserver.PacketManager
+import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packets.ServerClosePacket
 import nl.jochem.packetserver.packets.ServerOpenPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacketType
 import java.io.OutputStream
+import java.net.ConnectException
 import java.net.Socket
+import java.net.SocketException
+import java.nio.charset.Charset
 import java.util.*
 
-class PacketClient(address: String, private val port: Int, serverID: UUID) : PacketControl() {
+class PacketClient(private val address: String, private val port: Int, private val serverID: UUID) : PacketControl() {
     private var connected: Boolean = true
-    private var connection: Socket = Socket(address, port)
-    private var reader: Scanner = Scanner(connection.getInputStream())
-    internal var writer: OutputStream = connection.getOutputStream()
+    private lateinit var connection: Socket
+    private lateinit var reader: Scanner
+    internal lateinit var writer: OutputStream
 
     init {
-        read()
-        send(ServerOpenPacket(serverID), writer)
-        println("Connected to master server at $address on port $port [client]")
+        GlobalScope.launch {
+           enable()
+        }
+    }
+
+    private fun enable() {
+        while (!online) {
+            try {
+                connection = Socket(address, port)
+                reader = Scanner(connection.getInputStream())
+                writer = connection.getOutputStream()
+
+                read()
+                send(ServerOpenPacket(serverID), writer)
+                println("Connected to master server at $address on port $port [client]")
+
+                online(writer)
+            } catch (ex: ConnectException) {
+                Thread.sleep(1000)
+                enable()
+            }
+        }
+    }
+
+    override fun send(packet: Packet, writer: OutputStream) {
+        if(!online) {
+            loggedPackets.add(packet)
+            return println("Socket server is offline. Couldn't send the packet ${packet.packetID}")
+        }
+        if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
+
+        try {
+            writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
+        } catch (ex: SocketException) {
+            loggedPackets.add(packet)
+            enable()
+        }
+
+
     }
 
     private fun read() {
         GlobalScope.launch(Dispatchers.IO) {
             while (connected) {
-                if(reader.hasNextLine()) {
-                    val text = reader.nextLine()
+                try {
+                    if(reader.hasNextLine()) {
+                        val text = reader.nextLine()
 
-                    val packet = getPacketType(text)
-                    if(packet != null) {
-                        if(packet.packetID == ServerClosePacket::class.java.createName()) {
-                            disable()
+                        val packet = getPacketType(text)
+                        if(packet != null) {
+                            if(packet.packetID == ServerClosePacket::class.java.createName()) {
+                                disable()
+                            }
+                            recieve(text, packet)
+                        }else{
+                            println("PacketClient.getPacketType(text) == null")
+                            println("========================================")
+                            println(text)
+                            println("========================================")
                         }
-                        recieve(text, packet)
-                    }else{
-                        println("PacketClient.getPacketType(text) == null")
-                        println("========================================")
-                        println(text)
-                        println("========================================")
                     }
+                } catch (ex: SocketException) {
+                    disableServer()
+                    online(writer)
                 }
             }
         }
     }
 
+    private fun disableServer() {
+        online = false
+        reader.close()
+        connection.close()
+    }
 
     override fun disable() {
         connected = false
-        reader.close()
-        connection.close()
+        disableServer()
         println("Connection $port closed")
         PacketManager.shutdown = true
     }
