@@ -20,7 +20,7 @@ abstract class PacketControl {
 
     var online = false
 
-    abstract fun send(packet: Packet, writer: OutputStream)
+    abstract fun send(packet: Packet, writer: OutputStream? = null)
 
     fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>, priority: Int): SubscriptionPacket<T> {
         val subscription: SubscriptionPacket<T> = SubscriptionPacket(type, callback, priority)
@@ -41,7 +41,7 @@ abstract class PacketControl {
     }
 
     abstract fun disable()
-    fun online(writer: OutputStream) {
+    fun online(writer: OutputStream? = null) {
         online = true
         loggedPackets.forEach {
             send(it, writer)

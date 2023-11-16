@@ -34,9 +34,9 @@ class PacketServer(serverIP: String, port: Int) : PacketControl() {
         }
     }
 
-    override fun send(packet: Packet, writer: OutputStream) {
+    override fun send(packet: Packet, writer: OutputStream?) {
         if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
-        writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
+        writer?.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 
     internal fun createClient(serverID: UUID, serverClient: ServerClient) {

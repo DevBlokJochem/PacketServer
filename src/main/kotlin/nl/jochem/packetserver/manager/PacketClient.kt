@@ -14,7 +14,6 @@ import java.io.OutputStream
 import java.lang.Exception
 import java.net.ConnectException
 import java.net.Socket
-import java.net.SocketException
 import java.nio.charset.Charset
 import java.util.*
 
@@ -38,10 +37,10 @@ class PacketClient(private val address: String, private val port: Int, private v
                 writer = connection.getOutputStream()
 
                 read()
-                send(ServerOpenPacket(serverID), writer)
+                send(ServerOpenPacket(serverID))
                 println("Connected to master server at $address on port $port [client]")
 
-                online(writer)
+                online()
             } catch (ex: ConnectException) {
                 Thread.sleep(1000)
                 enable()
@@ -49,7 +48,7 @@ class PacketClient(private val address: String, private val port: Int, private v
         }
     }
 
-    override fun send(packet: Packet, writer: OutputStream) {
+    override fun send(packet: Packet, nullableWriter: OutputStream?) {
         if(!online) {
             loggedPackets.add(packet)
             return println("Socket server is offline. Couldn't send the packet ${packet.packetID}")
@@ -62,8 +61,6 @@ class PacketClient(private val address: String, private val port: Int, private v
             loggedPackets.add(packet)
             enable()
         }
-
-
     }
 
     private fun read() {
@@ -88,7 +85,7 @@ class PacketClient(private val address: String, private val port: Int, private v
                     }
                 } catch (ex: Exception) {
                     disableServer()
-                    online(writer)
+                    online()
                 }
             }
         }

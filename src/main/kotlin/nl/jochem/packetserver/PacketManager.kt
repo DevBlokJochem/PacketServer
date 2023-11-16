@@ -45,12 +45,12 @@ object PacketManager {
     fun send(packet: Packet, serverID: UUID? = null, exclude: UUID? = null) {
         if(!connected) return
         if(managerType == ManagerType.Client) {
-            packetControl.send(packet, (packetControl as PacketClient).writer)
+            packetControl.send(packet)
         }else{
             val packetServer = packetControl as PacketServer
             if(serverID == null) {
                 packetServer.getClients().forEach {
-                    if(exclude != it.key) packetControl.send(packet, it.value.writer)
+                    if(exclude != it.key) packetControl.send(packet)
                 }
             }else{
                 if(packetServer.getClients().containsKey(serverID)) return packetControl.send(packet, packetServer.getClients()[serverID]!!.writer)
