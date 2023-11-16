@@ -31,7 +31,7 @@ abstract class PacketControl {
 
     fun recieve(input: String, packet: Packet) {
         GlobalScope.launch(Dispatchers.IO) {
-            if(logged) println("Receive packet: ${packet.packetID} (${packet::class.java.createName()})")
+            if(logged) println("Receive packet: ${packet.packetID} (${packet.sender})")
             listeners.filter { sub -> packet.packetID == sub.packetType.createName() }.forEach {sub ->
                 val packet = getPacket(input, sub.packetType)
                 if(packet != null) {

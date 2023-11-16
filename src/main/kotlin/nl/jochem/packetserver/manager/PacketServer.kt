@@ -13,7 +13,7 @@ import java.nio.charset.Charset
 import java.util.*
 import kotlin.collections.HashMap
 
-class PacketServer(serverIP: String, port: Int) : PacketControl() {
+class PacketServer(serverIP: String, val port: Int) : PacketControl() {
 
     private val server: ServerSocket = ServerSocket(port)
     private val clients: HashMap<UUID, ServerClient> = HashMap()
@@ -35,7 +35,7 @@ class PacketServer(serverIP: String, port: Int) : PacketControl() {
     }
 
     override fun send(packet: Packet, writer: OutputStream?) {
-        if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
+        if(logged) println("Send packet: ${packet.packetID})")
         writer?.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
     }
 

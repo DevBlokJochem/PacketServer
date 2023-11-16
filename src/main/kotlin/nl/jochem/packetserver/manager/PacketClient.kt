@@ -95,6 +95,8 @@ class PacketClient(private val address: String, private val port: Int, private v
         online = false
         if(::reader.isInitialized) reader.close()
         if(::connection.isInitialized) connection.close()
+
+        println("Detected that the packet server is offline. Waiting to come back online!")
     }
 
     override fun disable() {
