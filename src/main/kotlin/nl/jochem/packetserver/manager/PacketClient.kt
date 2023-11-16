@@ -11,6 +11,7 @@ import nl.jochem.packetserver.packets.ServerOpenPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacketType
 import java.io.OutputStream
+import java.lang.Exception
 import java.net.ConnectException
 import java.net.Socket
 import java.net.SocketException
@@ -57,7 +58,7 @@ class PacketClient(private val address: String, private val port: Int, private v
 
         try {
             writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
-        } catch (ex: SocketException) {
+        } catch (ex: Exception) {
             loggedPackets.add(packet)
             enable()
         }
@@ -85,7 +86,7 @@ class PacketClient(private val address: String, private val port: Int, private v
                             println("========================================")
                         }
                     }
-                } catch (ex: SocketException) {
+                } catch (ex: Exception) {
                     disableServer()
                     online(writer)
                 }
@@ -95,8 +96,8 @@ class PacketClient(private val address: String, private val port: Int, private v
 
     private fun disableServer() {
         online = false
-        reader.close()
-        connection.close()
+        if(::reader.isInitialized) reader.close()
+        if(::connection.isInitialized) connection.close()
     }
 
     override fun disable() {
