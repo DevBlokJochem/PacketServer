@@ -65,7 +65,7 @@ class PacketClient(private val address: String, private val port: Int, private v
 
     private fun read() {
         GlobalScope.launch(Dispatchers.IO) {
-            while (connected) {
+            while (connected && online) {
                 try {
                     if(reader.hasNextLine()) {
                         val text = reader.nextLine()
