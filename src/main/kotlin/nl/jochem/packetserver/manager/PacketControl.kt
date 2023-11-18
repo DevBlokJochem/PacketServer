@@ -41,6 +41,7 @@ abstract class PacketControl {
         }
     }
 
+    abstract fun read()
     abstract fun disable()
     fun online(writer: OutputStream? = null) {
         online = true
@@ -49,5 +50,6 @@ abstract class PacketControl {
         loggedPackets.forEach {
             send(it, writer)
         }
+        read()
     }
 }

@@ -60,4 +60,8 @@ class PacketServer(serverIP: String, val port: Int) : PacketControl() {
         println("Server master closed")
         PacketManager.shutdown = true
     }
+
+    override fun read() {
+
+    }
 }

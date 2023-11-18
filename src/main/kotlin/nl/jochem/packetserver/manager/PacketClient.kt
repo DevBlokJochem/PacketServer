@@ -36,11 +36,10 @@ class PacketClient(private val address: String, private val port: Int, private v
                 reader = Scanner(connection.getInputStream())
                 writer = connection.getOutputStream()
 
-                read()
+                online()
                 send(ServerOpenPacket(serverID))
                 println("Connected to master server at $address on port $port [client]")
 
-                online()
             } catch (ex: ConnectException) {
                 Thread.sleep(1000)
                 enable()
@@ -63,7 +62,7 @@ class PacketClient(private val address: String, private val port: Int, private v
         }
     }
 
-    private fun read() {
+    override fun read() {
         GlobalScope.launch(Dispatchers.IO) {
             while (connected && online) {
                 try {
