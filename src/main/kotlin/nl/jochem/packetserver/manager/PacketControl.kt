@@ -13,6 +13,7 @@ abstract class PacketControl {
 
     private val listeners: PriorityQueue<SubscriptionPacket<*>> = PriorityQueue()
     internal val logged = RegisterSettingsConfig().getInstance().logs
+    internal val loggedPackets: ArrayList<Packet> = ArrayList()
 
     abstract fun send(packet: Packet, writer: OutputStream? = null)
 
