@@ -19,8 +19,6 @@ abstract class PacketControl {
     internal val logged = RegisterSettingsConfig().getInstance().logs
     internal val loggedPackets: ArrayList<Packet> = ArrayList()
 
-    var online = false
-
     abstract fun send(packet: Packet, writer: OutputStream? = null)
 
     fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>, priority: Int): SubscriptionPacket<T> {
@@ -43,7 +41,6 @@ abstract class PacketControl {
 
     abstract fun disable()
     fun online(writer: OutputStream? = null) {
-        online = true
         loggedPackets.removeIf { packet -> packet.packetID == ServerOpenPacket.ID }
         send(ServerOpenPacket(RegisterSettingsConfig().getInstance().serverID))
         loggedPackets.forEach {

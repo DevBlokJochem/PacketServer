@@ -18,10 +18,9 @@ import java.nio.charset.Charset
 import java.util.*
 
 class PacketClient(private val address: String, private val port: Int, private val serverID: UUID) : PacketControl() {
-    private var connected: Boolean = true
-    private lateinit var connection: Socket
-    private lateinit var reader: Scanner
-    internal lateinit var writer: OutputStream
+    private var connection: Socket? = null
+    private var reader: Scanner? = null
+    private var writer: OutputStream? = null
 
     init {
         enable()
@@ -30,48 +29,46 @@ class PacketClient(private val address: String, private val port: Int, private v
 
     private fun enable() {
         GlobalScope.launch {
-            while (true) {
-                if(!online){
-                    try {
-                        connection = Socket(address, port)
-                        reader = Scanner(connection.getInputStream())
-                        writer = connection.getOutputStream()
+            try {
+                if(connection == null) {
+                    connection = Socket(address, port)
+                    reader = Scanner(connection!!.getInputStream())
+                    writer = connection!!.getOutputStream()
 
-                        online()
-                        send(ServerOpenPacket(serverID))
-                        println("Connected to master server at $address on port $port [client]")
-
-                    } catch (ex: ConnectException) {
-                        Thread.sleep(1000)
-                        enable()
-                    }
+                    online()
+                    send(ServerOpenPacket(serverID))
+                    println("Connected to master server at $address on port $port [client]")
                 }
+            } catch (ex: ConnectException) {
+                connection 
+                Thread.sleep(1000)
+                enable()
             }
         }
     }
 
     override fun send(packet: Packet, nullableWriter: OutputStream?) {
-        if(!online) {
+        if(connection == null) {
             loggedPackets.add(packet)
             return println("Socket server is offline. Couldn't send the packet ${packet.packetID}")
         }
         if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
 
         try {
-            writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
+            writer?.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
         } catch (ex: Exception) {
             loggedPackets.add(packet)
-            enable()
+            disable()
         }
     }
 
-    fun read() {
+    private fun read() {
         GlobalScope.launch(Dispatchers.IO) {
             while (true) {
-                if(connected && online) {
+                if(connection != null) {
                     try {
-                        if(reader.hasNextLine()) {
-                            val text = reader.nextLine()
+                        if(reader!!.hasNextLine()) {
+                            val text = reader!!.nextLine()
 
                             val packet = getPacketType(text)
                             if(packet != null) {
@@ -96,15 +93,18 @@ class PacketClient(private val address: String, private val port: Int, private v
     }
 
     private fun disableServer() {
-        online = false
-        if(::reader.isInitialized) reader.close()
-        if(::connection.isInitialized) connection.close()
+        connection?.close()
+        reader?.close()
+        writer?.close()
+
+        connection = null
+        reader = null
+        writer = null
 
         println("Detected that the packet server is offline. Waiting to come back online!")
     }
 
     override fun disable() {
-        connected = false
         disableServer()
         println("Connection $port closed")
         PacketManager.shutdown = true
