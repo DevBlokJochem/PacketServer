@@ -3,7 +3,6 @@ package nl.jochem.packetserver.manager
 import nl.jochem.packetserver.config.RegisterSettingsConfig
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packethelpers.SubscriptionPacket
-import nl.jochem.packetserver.packets.ServerOpenPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacket
 import java.io.OutputStream
@@ -14,7 +13,6 @@ abstract class PacketControl {
 
     private val listeners: PriorityQueue<SubscriptionPacket<*>> = PriorityQueue()
     internal val logged = RegisterSettingsConfig().getInstance().logs
-    internal val loggedPackets: ArrayList<Packet> = ArrayList()
 
     abstract fun send(packet: Packet, writer: OutputStream? = null)
 
