@@ -24,27 +24,27 @@ class PacketClient(private val address: String, private val port: Int, private v
     internal lateinit var writer: OutputStream
 
     init {
-        GlobalScope.launch {
-            enable()
-            read()
-        }
+        enable()
+        read()
     }
 
     private fun enable() {
-        while (true) {
-            if(!online){
-                try {
-                    connection = Socket(address, port)
-                    reader = Scanner(connection.getInputStream())
-                    writer = connection.getOutputStream()
+        GlobalScope.launch {
+            while (true) {
+                if(!online){
+                    try {
+                        connection = Socket(address, port)
+                        reader = Scanner(connection.getInputStream())
+                        writer = connection.getOutputStream()
 
-                    online()
-                    send(ServerOpenPacket(serverID))
-                    println("Connected to master server at $address on port $port [client]")
+                        online()
+                        send(ServerOpenPacket(serverID))
+                        println("Connected to master server at $address on port $port [client]")
 
-                } catch (ex: ConnectException) {
-                    Thread.sleep(1000)
-                    enable()
+                    } catch (ex: ConnectException) {
+                        Thread.sleep(1000)
+                        enable()
+                    }
                 }
             }
         }
@@ -93,6 +93,7 @@ class PacketClient(private val address: String, private val port: Int, private v
                     }
                 }else{
                     println("reader is disabled!")
+                    Thread.sleep(200)
                 }
             }
         }
