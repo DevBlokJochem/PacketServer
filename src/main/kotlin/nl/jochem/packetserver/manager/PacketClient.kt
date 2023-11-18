@@ -25,24 +25,27 @@ class PacketClient(private val address: String, private val port: Int, private v
 
     init {
         GlobalScope.launch {
-           enable()
+            enable()
+            read()
         }
     }
 
     private fun enable() {
-        while (!online) {
-            try {
-                connection = Socket(address, port)
-                reader = Scanner(connection.getInputStream())
-                writer = connection.getOutputStream()
+        while (true) {
+            if(!online){
+                try {
+                    connection = Socket(address, port)
+                    reader = Scanner(connection.getInputStream())
+                    writer = connection.getOutputStream()
 
-                online()
-                send(ServerOpenPacket(serverID))
-                println("Connected to master server at $address on port $port [client]")
+                    online()
+                    send(ServerOpenPacket(serverID))
+                    println("Connected to master server at $address on port $port [client]")
 
-            } catch (ex: ConnectException) {
-                Thread.sleep(1000)
-                enable()
+                } catch (ex: ConnectException) {
+                    Thread.sleep(1000)
+                    enable()
+                }
             }
         }
     }
@@ -62,29 +65,31 @@ class PacketClient(private val address: String, private val port: Int, private v
         }
     }
 
-    override fun read() {
+    fun read() {
         GlobalScope.launch(Dispatchers.IO) {
-            while (connected && online) {
-                try {
-                    if(reader.hasNextLine()) {
-                        val text = reader.nextLine()
+            while (true) {
+                if(connected && online) {
+                    try {
+                        if(reader.hasNextLine()) {
+                            val text = reader.nextLine()
 
-                        val packet = getPacketType(text)
-                        if(packet != null) {
-                            if(packet.packetID == ServerClosePacket::class.java.createName()) {
-                                disable()
+                            val packet = getPacketType(text)
+                            if(packet != null) {
+                                if(packet.packetID == ServerClosePacket::class.java.createName()) {
+                                    disable()
+                                }
+                                recieve(text, packet)
+                            }else{
+                                println("PacketClient.getPacketType(text) == null")
+                                println("========================================")
+                                println(text)
+                                println("========================================")
                             }
-                            recieve(text, packet)
-                        }else{
-                            println("PacketClient.getPacketType(text) == null")
-                            println("========================================")
-                            println(text)
-                            println("========================================")
                         }
+                    } catch (ex: Exception) {
+                        disableServer()
+                        online()
                     }
-                } catch (ex: Exception) {
-                    disableServer()
-                    online()
                 }
             }
         }
