@@ -66,6 +66,7 @@ class PacketClient(private val address: String, private val port: Int, private v
         GlobalScope.launch(Dispatchers.IO) {
             while (true) {
                 if(connection != null) {
+                    println("Connection != null")
                     try {
                         if(reader!!.hasNextLine()) {
                             val text = reader!!.nextLine()
@@ -87,6 +88,8 @@ class PacketClient(private val address: String, private val port: Int, private v
                         disableServer()
                         online()
                     }
+                }else{
+                    println("Connection == null")
                 }
             }
         }
