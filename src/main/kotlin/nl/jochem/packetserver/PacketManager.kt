@@ -44,19 +44,7 @@ object PacketManager {
 
     fun send(packet: Packet, serverID: UUID? = null, exclude: UUID? = null) {
         if(!connected) return
-        if(managerType == ManagerType.Client) {
-            packetControl.send(packet)
-        }else{
-            val packetServer = packetControl as PacketServer
-            if(serverID == null) {
-                packetServer.getClients().forEach {
-                    if(exclude != it.key) packetControl.send(packet)
-                }
-            }else{
-                if(packetServer.getClients().containsKey(serverID)) return packetControl.send(packet, packetServer.getClients()[serverID]!!.writer)
-                println("You cannot send the packet ${packet.packetID} because the target server doesn't exists.")
-            }
-        }
+        packetControl.send(packet, serverID, exclude)
     }
 
     fun getServerType(): ManagerType? = managerType

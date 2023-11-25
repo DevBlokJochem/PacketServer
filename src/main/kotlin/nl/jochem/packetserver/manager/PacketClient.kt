@@ -44,7 +44,7 @@ class PacketClient(private val address: String, private val port: Int, private v
         }
     }
 
-    override fun send(packet: Packet, nullableWriter: OutputStream?) {
+    override fun send(packet: Packet, serverID: UUID?, exclude: UUID?) {
         if(connection == null) {
             if(packet.packetID != ServerOpenPacket.ID) loggedPackets.add(packet)
             return println("Socket server is offline. Couldn't send the packet ${packet.packetID}")
@@ -63,7 +63,7 @@ class PacketClient(private val address: String, private val port: Int, private v
         GlobalScope.launch(Dispatchers.IO) {
             send(ServerOpenPacket(serverID))
             loggedPackets.forEach {
-                send(it, writer)
+                send(it)
             }
             while (connection != null) {
                 try {

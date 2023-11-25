@@ -6,14 +6,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.jochem.packetserver.PacketManager
 import nl.jochem.packetserver.packethelpers.Packet
-import nl.jochem.packetserver.utils.createName
-import java.io.OutputStream
 import java.net.ServerSocket
 import java.nio.charset.Charset
 import java.util.*
 import kotlin.collections.HashMap
 
-class PacketServer(serverIP: String, val port: Int) : PacketControl() {
+class PacketServer(serverIP: String, port: Int) : PacketControl() {
 
     private val server: ServerSocket = ServerSocket(port)
     private val clients: HashMap<UUID, ServerClient> = HashMap()
@@ -34,10 +32,19 @@ class PacketServer(serverIP: String, val port: Int) : PacketControl() {
         }
     }
 
-    override fun send(packet: Packet, writer: OutputStream?) {
+    override fun send(packet: Packet, serverID: UUID?, exclude: UUID?) {
         if(logged) println("Send packet: ${packet.packetID})")
-        writer?.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
+        if(serverID == null) {
+            clients.filter { client -> client.key != exclude }.forEach {
+                it.value.writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
+            }
+        }else{
+            clients.filter { client -> client.key == serverID }.forEach {
+                it.value.writer.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
+            }
+        }
     }
+
 
     internal fun createClient(serverID: UUID, serverClient: ServerClient) {
         clients[serverID] = serverClient

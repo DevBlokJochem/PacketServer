@@ -5,7 +5,6 @@ import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packethelpers.SubscriptionPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacket
-import java.io.OutputStream
 import java.util.*
 import java.util.function.Consumer
 
@@ -15,7 +14,7 @@ abstract class PacketControl {
     internal val logged = RegisterSettingsConfig().getInstance().logs
     internal val loggedPackets: ArrayList<Packet> = ArrayList()
 
-    abstract fun send(packet: Packet, writer: OutputStream? = null)
+    abstract fun send(packet: Packet, serverID: UUID? = null, exclude: UUID? = null)
 
     fun <T : Packet> subscribe(type: Class<T>, callback: Consumer<T>, priority: Int): SubscriptionPacket<T> {
         val subscription: SubscriptionPacket<T> = SubscriptionPacket(type, callback, priority)
