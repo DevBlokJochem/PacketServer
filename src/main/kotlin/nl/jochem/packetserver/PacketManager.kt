@@ -20,6 +20,7 @@ object PacketManager {
     private lateinit var serverID: UUID
     private var connected = false
     internal var shutdown = false
+    // pretty printing has to be OFF!
     internal var gsonBuilder = GsonBuilder()
 
     fun main(args: Array<String>) {
