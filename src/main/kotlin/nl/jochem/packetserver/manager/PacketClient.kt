@@ -73,7 +73,7 @@ class PacketClient(private val address: String, private val port: Int, private v
                         val packet = getPacketType(text)
                         if(packet != null) {
                             if(packet.packetID == ServerClosePacket::class.java.createName()) {
-                                disable()
+                                disableServer()
                             }
                             recieve(text, packet)
                         }else{
