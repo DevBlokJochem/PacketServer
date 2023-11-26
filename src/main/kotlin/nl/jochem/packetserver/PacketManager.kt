@@ -20,7 +20,7 @@ object PacketManager {
     private lateinit var serverID: UUID
     private var connected = false
     internal var shutdown = false
-    internal var gsonBuilder = GsonBuilder().setPrettyPrinting()
+    internal var gsonBuilder = GsonBuilder()
 
     fun main(args: Array<String>) {
         println("===========================================")
