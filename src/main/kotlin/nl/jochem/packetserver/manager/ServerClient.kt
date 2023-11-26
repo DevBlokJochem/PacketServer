@@ -40,13 +40,12 @@ class ServerClient(private val client: Socket, packetServer: PacketServer) {
                                 val specificPacket = getSpecificPacket(text, ServerOpenPacket::class.java) as ServerOpenPacket
                                 packetServer.createClient(specificPacket.serverID, instance)
                                 cliendID = specificPacket.serverID
-                            }else{
-                                if(packet.packetID == ServerClosePacket::class.java.createName()) {
-                                    disable()
-                                    packetServer.disableClient(cliendID)
-                                }
-                                packetServer.recieve(text, getPacketType(text) as Packet)
+                            }else if(packet.packetID == ServerClosePacket::class.java.createName()) {
+                                disable()
+                                packetServer.disableClient(cliendID)
                             }
+
+                            packetServer.recieve(text, getPacketType(text) as Packet)
                         }
                     }
                 } catch (ex: Exception) {
