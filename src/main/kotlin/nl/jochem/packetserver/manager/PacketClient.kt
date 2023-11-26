@@ -1,7 +1,9 @@
 package nl.jochem.packetserver.manager
 
-import com.google.gson.GsonBuilder
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import nl.jochem.packetserver.PacketManager
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packets.ServerClosePacket
@@ -9,7 +11,6 @@ import nl.jochem.packetserver.packets.ServerOpenPacket
 import nl.jochem.packetserver.utils.createName
 import nl.jochem.packetserver.utils.getPacketType
 import java.io.OutputStream
-import java.lang.Exception
 import java.net.ConnectException
 import java.net.Socket
 import java.nio.charset.Charset
@@ -52,7 +53,7 @@ class PacketClient(private val address: String, private val port: Int, private v
         if(logged) println("Send packet: ${packet.packetID} (${packet::class.java.createName()})")
 
         try {
-            writer?.write((GsonBuilder().create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
+            writer?.write((PacketManager.gsonBuilder.create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
         } catch (ex: Exception) {
             loggedPackets.add(packet)
             disableServer()

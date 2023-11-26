@@ -1,12 +1,16 @@
 package nl.jochem.packetserver
 
+import com.google.gson.GsonBuilder
 import nl.jochem.packetserver.config.PacketServerSettings
 import nl.jochem.packetserver.config.RegisterSettingsConfig
-import nl.jochem.packetserver.manager.*
+import nl.jochem.packetserver.manager.ManagerType
+import nl.jochem.packetserver.manager.PacketClient
+import nl.jochem.packetserver.manager.PacketControl
+import nl.jochem.packetserver.manager.PacketServer
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packethelpers.SubscriptionPacket
 import nl.jochem.packetserver.packets.ServerClosePacket
-import java.util.UUID
+import java.util.*
 import java.util.function.Consumer
 
 object PacketManager {
@@ -16,6 +20,7 @@ object PacketManager {
     private lateinit var serverID: UUID
     private var connected = false
     internal var shutdown = false
+    internal var gsonBuilder = GsonBuilder().setPrettyPrinting()
 
     fun main(args: Array<String>) {
         println("===========================================")
@@ -25,7 +30,9 @@ object PacketManager {
         println("===========================================")
     }
 
-    fun enable(serverType: ManagerType) {
+    fun enable(serverType: ManagerType, gsonBuilder: GsonBuilder = GsonBuilder()) {
+        this.gsonBuilder = gsonBuilder
+
         if(this.managerType != null) return println("The packetserver $managerType is already enabled.")
         this.managerType = serverType
         config = RegisterSettingsConfig().getInstance()
