@@ -21,7 +21,7 @@ object PacketManager {
     private var connected = false
     internal var shutdown = false
     // pretty printing has to be OFF!
-    internal var gsonBuilder = GsonBuilder()
+    var gsonBuilder = GsonBuilder()
 
     fun main(args: Array<String>) {
         println("===========================================")
@@ -31,9 +31,7 @@ object PacketManager {
         println("===========================================")
     }
 
-    fun enable(serverType: ManagerType, gsonBuilder: GsonBuilder = GsonBuilder()) {
-        this.gsonBuilder = gsonBuilder
-
+    fun enable(serverType: ManagerType) {
         if(this.managerType != null) return println("The packetserver $managerType is already enabled.")
         this.managerType = serverType
         config = RegisterSettingsConfig().getInstance()
