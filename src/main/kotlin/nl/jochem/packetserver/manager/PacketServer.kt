@@ -55,6 +55,11 @@ class PacketServer(serverIP: String, port: Int) : PacketControl() {
         }
     }
 
+    fun disableClient(serverClient: ServerClient)  {
+        val key = clients.filter { client -> client.value == serverClient }.keys.first()
+        clients.remove(key)
+    }
+
     fun getClients(): Map<UUID, ServerClient> = clients.toMap()
 
     override fun disable() {

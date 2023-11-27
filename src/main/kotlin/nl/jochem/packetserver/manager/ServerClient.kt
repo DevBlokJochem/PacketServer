@@ -58,6 +58,7 @@ class ServerClient(private val client: Socket, packetServer: PacketServer) {
     fun disable() {
         running = false
         client.close()
+        packetServer.disableClient(this)
         println("${client.inetAddress.hostAddress} closed the connection")
     }
 
