@@ -32,8 +32,6 @@ class PacketServer(serverIP: String, port: Int) : PacketControl() {
 
     override fun send(packet: Packet, serverID: UUID?, exclude: UUID?) {
         if(logged) println("Send packet: ${packet.packetID})")
-        println(packet.toString())
-        println(PacketManager.gsonBuilder.create()!!.toJson(packet) + '\n')
         if(serverID == null) {
             clients.filter { client -> client.key != exclude }.forEach {
                 it.value.writer.write((PacketManager.gsonBuilder.create()!!.toJson(packet) + '\n').toByteArray(Charset.defaultCharset()))
