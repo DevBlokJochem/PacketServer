@@ -2,6 +2,7 @@ package nl.jochem.packetserver.manager
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import nl.jochem.packetserver.packethelpers.Packet
 import nl.jochem.packetserver.packets.ServerClosePacket
@@ -20,6 +21,7 @@ class ServerClient(private val client: Socket, packetServer: PacketServer) {
     private val packetServer: PacketServer
     private val instance: ServerClient = this
     private lateinit var cliendID: UUID
+    private lateinit var scope: Job
 
     init {
         this.packetServer = packetServer
@@ -28,7 +30,7 @@ class ServerClient(private val client: Socket, packetServer: PacketServer) {
     fun run() {
         running = true
 
-        GlobalScope.launch(Dispatchers.IO) {
+        scope = GlobalScope.launch(Dispatchers.IO) {
             while (running) {
                 try {
                     if(reader.hasNextLine()) {
@@ -59,6 +61,7 @@ class ServerClient(private val client: Socket, packetServer: PacketServer) {
         running = false
         client.close()
         packetServer.disableClient(this)
+        if(::scope.isInitialized) scope.cancel()
         println("${client.inetAddress.hostAddress} closed the connection")
     }
 
